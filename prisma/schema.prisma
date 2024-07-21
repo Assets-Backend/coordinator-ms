@@ -1,0 +1,139 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
+model client {
+  client_id                                                                Int                          @id @default(autoincrement())
+  client_fk                                                                Int?
+  name                                                                     String                       @db.VarChar(100)
+  last_name                                                                String                       @db.VarChar(100)
+  profile                                                                  String                       @unique @db.VarChar(100)
+  phone                                                                    String?                      @db.VarChar(30)
+  email                                                                    String?                      @db.VarChar(255)
+  password                                                                 String                       @db.VarChar(255)
+  gender                                                                   gender_options
+  user_type                                                                user_types[]
+  deleted_at                                                               DateTime?                    @db.Timestamp(6)
+  created_at                                                               DateTime                     @default(now()) @db.Timestamp(6)
+  updated_at                                                               DateTime                     @default(now()) @db.Timestamp(6)
+  client                                                                   client?                      @relation("clientToclient", fields: [client_fk], references: [client_id], onDelete: NoAction, onUpdate: NoAction)
+  other_client                                                             client[]                     @relation("clientToclient")
+  company_company_client_fkToclient                                        company[]                    @relation("company_client_fkToclient")
+  company_company_updated_byToclient                                       company[]                    @relation("company_updated_byToclient")
+  company_has_treatment_company_has_treatment_client_fkToclient            company_has_treatment[]      @relation("company_has_treatment_client_fkToclient")
+  company_has_treatment_company_has_treatment_updated_byToclient           company_has_treatment[]      @relation("company_has_treatment_updated_byToclient")
+  patient_patient_client_fkToclient                                        patient[]                    @relation("patient_client_fkToclient")
+  patient_patient_updated_byToclient                                       patient[]                    @relation("patient_updated_byToclient")
+  treatment_treatment_client_fkToclient                                    treatment[]                  @relation("treatment_client_fkToclient")
+  treatment_treatment_updated_byToclient                                   treatment[]                  @relation("treatment_updated_byToclient")
+  treatment_has_professional_treatment_has_professional_client_fkToclient  treatment_has_professional[] @relation("treatment_has_professional_client_fkToclient")
+  treatment_has_professional_treatment_has_professional_updated_byToclient treatment_has_professional[] @relation("treatment_has_professional_updated_byToclient")
+}
+
+model company {
+  company_id                        Int                          @id @default(autoincrement())
+  client_fk                         Int
+  name                              String                       @db.VarChar(100)
+  cuit                              String?                      @db.VarChar(20)
+  note                              String?
+  updated_by                        Int
+  deleted_at                        DateTime?                    @db.Timestamp(6)
+  created_at                        DateTime                     @default(now()) @db.Timestamp(6)
+  updated_at                        DateTime                     @default(now()) @db.Timestamp(6)
+  client_company_client_fkToclient  client                       @relation("company_client_fkToclient", fields: [client_fk], references: [client_id], onDelete: NoAction, onUpdate: NoAction)
+  client_company_updated_byToclient client                       @relation("company_updated_byToclient", fields: [updated_by], references: [client_id], onDelete: NoAction, onUpdate: NoAction)
+  company_has_treatment             company_has_treatment[]
+  patient                           patient[]
+  treatment_has_professional        treatment_has_professional[]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model company_has_treatment {
+  client_fk                                       Int
+  company_fk                                      Int
+  treatment_fk                                    Int
+  value                                           Decimal   @db.Decimal(7, 2)
+  updated_by                                      Int
+  created_at                                      DateTime  @default(now()) @db.Timestamp(6)
+  updated_at                                      DateTime  @default(now()) @db.Timestamp(6)
+  client_company_has_treatment_client_fkToclient  client    @relation("company_has_treatment_client_fkToclient", fields: [client_fk], references: [client_id], onDelete: NoAction, onUpdate: NoAction)
+  company                                         company   @relation(fields: [company_fk], references: [company_id], onDelete: NoAction, onUpdate: NoAction)
+  treatment                                       treatment @relation(fields: [treatment_fk], references: [treatment_id], onDelete: NoAction, onUpdate: NoAction)
+  client_company_has_treatment_updated_byToclient client    @relation("company_has_treatment_updated_byToclient", fields: [updated_by], references: [client_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([client_fk, company_fk, treatment_fk])
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model patient {
+  patient_id                        Int            @id @default(autoincrement())
+  client_fk                         Int
+  company_fk                        Int
+  name                              String         @db.VarChar(100)
+  last_name                         String         @db.VarChar(100)
+  healthcare_provider               String?        @db.VarChar(100)
+  gender                            gender_options
+  age                               Int?           @db.SmallInt
+  phone                             String?        @db.VarChar(30)
+  note                              String?
+  updated_by                        Int
+  deleted_at                        DateTime?      @db.Timestamp(6)
+  created_at                        DateTime       @default(now()) @db.Timestamp(6)
+  updated_at                        DateTime       @default(now()) @db.Timestamp(6)
+  client_patient_client_fkToclient  client         @relation("patient_client_fkToclient", fields: [client_fk], references: [client_id], onDelete: NoAction, onUpdate: NoAction)
+  company                           company        @relation(fields: [company_fk], references: [company_id], onDelete: NoAction, onUpdate: NoAction)
+  client_patient_updated_byToclient client         @relation("patient_updated_byToclient", fields: [updated_by], references: [client_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model treatment {
+  treatment_id                        Int                          @id @default(autoincrement())
+  client_fk                           Int
+  name                                String                       @db.VarChar(100)
+  abbreviation                        String                       @db.VarChar(10)
+  description                         String?
+  updated_by                          Int
+  deleted_at                          DateTime?                    @db.Timestamp(6)
+  created_at                          DateTime                     @default(now()) @db.Timestamp(6)
+  updated_at                          DateTime                     @default(now()) @db.Timestamp(6)
+  company_has_treatment               company_has_treatment[]
+  client_treatment_client_fkToclient  client                       @relation("treatment_client_fkToclient", fields: [client_fk], references: [client_id], onDelete: NoAction, onUpdate: NoAction)
+  client_treatment_updated_byToclient client                       @relation("treatment_updated_byToclient", fields: [updated_by], references: [client_id], onDelete: NoAction, onUpdate: NoAction)
+  treatment_has_professional          treatment_has_professional[]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model treatment_has_professional {
+  client_fk                                            Int
+  professional_fk                                      Int
+  company_fk                                           Int
+  treatment_fk                                         Int
+  value                                                Decimal   @db.Decimal(7, 2)
+  updated_by                                           Int
+  created_at                                           DateTime  @default(now()) @db.Timestamp(6)
+  updated_at                                           DateTime  @default(now()) @db.Timestamp(6)
+  client_treatment_has_professional_client_fkToclient  client    @relation("treatment_has_professional_client_fkToclient", fields: [client_fk], references: [client_id], onDelete: NoAction, onUpdate: NoAction)
+  company                                              company   @relation(fields: [company_fk], references: [company_id], onDelete: NoAction, onUpdate: NoAction)
+  treatment                                            treatment @relation(fields: [treatment_fk], references: [treatment_id], onDelete: NoAction, onUpdate: NoAction)
+  client_treatment_has_professional_updated_byToclient client    @relation("treatment_has_professional_updated_byToclient", fields: [updated_by], references: [client_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([client_fk, professional_fk, company_fk, treatment_fk])
+}
+
+enum gender_options {
+  m
+  f
+  M
+  F
+}
+
+enum user_types {
+  client
+  clientAdmin
+}
