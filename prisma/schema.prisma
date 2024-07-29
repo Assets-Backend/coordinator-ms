@@ -7,19 +7,13 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
-/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
 model client {
   client_id                                                                Int                          @id @default(autoincrement())
   client_fk                                                                Int?
+  mongo_id                                                                 String                       @unique
   name                                                                     String                       @db.VarChar(100)
   last_name                                                                String                       @db.VarChar(100)
   profile                                                                  String                       @unique @db.VarChar(100)
-  phone                                                                    String?                      @db.VarChar(30)
-  email                                                                    String?                      @db.VarChar(255)
-  password                                                                 String                       @db.VarChar(255)
-  gender                                                                   gender_options
-  user_type                                                                user_types[]
   deleted_at                                                               DateTime?                    @db.Timestamp(6)
   created_at                                                               DateTime                     @default(now()) @db.Timestamp(6)
   updated_at                                                               DateTime                     @default(now()) @db.Timestamp(6)
@@ -131,9 +125,4 @@ enum gender_options {
   f
   M
   F
-}
-
-enum user_types {
-  client
-  clientAdmin
 }

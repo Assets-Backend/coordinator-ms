@@ -25,7 +25,6 @@ async function bootstrap() {
         }),
     );
 
-
     await app.listen();
     logger.log(`Coordinator microservice is running on port ${envs.port}`);
 }
