@@ -1,1 +1,1 @@
-export { CommonModule } from "./common/common.module";
+export { ClientModule } from "./client/client.module";

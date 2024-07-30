@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { 
-    CommonModule,
+    ClientModule,
 } from './modules';
 
 @Module({
     imports: [
-        CommonModule
+        ClientModule,
     ],
     controllers: [],
     providers: [],
