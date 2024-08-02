@@ -4,6 +4,8 @@ import { ClientService } from './client.service';
 import { CreateClientDto, UpdateClientDto } from './dto';
 import { client } from '@prisma/client';
 import { PaginationDto } from 'src/common/dto'
+import { CurrentClient } from 'src/common/decorators/current-client.decorator';
+import { ClientIds } from 'src/common/interface/client-ids.interface';
 
 @Controller()
 export class ClientController {
@@ -11,54 +13,49 @@ export class ClientController {
 	constructor(private readonly clientService: ClientService) {}
 
 	@MessagePattern('coordinator.find.user')
-	Client(
-		@Payload() user: {mongo_id: string, client_id: number}
+	findOne(
+        @CurrentClient() currentClient: ClientIds,
+        @Payload('user_id') client_id: number
 	): Promise<client> {
-
-        const { mongo_id, client_id } = user
-
-		return this.clientService.findOneByUnique({
-            clientWhereUniqueInput: {
-                client_id,
-                mongo_id
-            }
+        console.log('currentClient', currentClient)
+		return this.clientService.findOneByUnique(currentClient, {
+            clientWhereUniqueInput: { client_id }
         });
 	}
 
     @MessagePattern('coordinator.find.users')
-	findUsers(
-	    @Payload() user: {mongo_id: string, client_id: number, paginationDto: PaginationDto}
+	findAll(
+        @CurrentClient() currentClient: ClientIds,
+	    @Payload('paginationDto') paginationDto: PaginationDto
 	): Promise<client[]> {
 
-        const { mongo_id, client_id, paginationDto: {limit: take, offset: skip} } = user
+        const { limit: take, offset: skip } = paginationDto
 
-        return this.clientService.findAll({
-            where: {
-                client: {
-                    client_id,
-                    mongo_id
-                },
-                deleted_at: null
-            },
+        return this.clientService.findAll(currentClient, {
+            whereInput: { deleted_at: null },
             skip,
             take
         })
 	}
 
-    @MessagePattern('coordinator.delete.user')
-	deleteUser(
-	    @Payload() user: {mongo_id: string, client_id: number, user_id: number}
+    @MessagePattern('coordinator.update.user')
+	update(
+        @CurrentClient() currentClient: ClientIds,
+	    @Payload('updateClientDto') updateClientDto: UpdateClientDto
 	): Promise<client> {
 
-        const { mongo_id, client_id, user_id } = user
+        return this.clientService.update(currentClient, {
+            data: updateClientDto
+        })
+	}
 
-        return this.clientService.delete({
-            where: {
-                client: {
-                    client_id,
-                    mongo_id
-                }
-            },
+    @MessagePattern('coordinator.delete.user')
+	delete(
+        @CurrentClient() currentClient: ClientIds,
+	    @Payload('user_id') user_id: number
+	): Promise<client> {
+
+        return this.clientService.delete(currentClient, {
             client_id: user_id
         })
 	}
