@@ -40,6 +40,22 @@ export class PatientController {
         });
     }
 
+    @MessagePattern('coordinator.findByCompany.patient')
+    findByCompany(
+        @CurrentClient() currentClient: ClientIds,
+        @Payload('company_fk') company_fk: number,
+        @Payload('paginationDto') paginationDto: PaginationDto
+    ): Promise<patient[]> {
+
+        const { limit: take, offset: skip } = paginationDto
+
+        return this.patientService.findByCompany(currentClient, {
+            patientWhereInput: { company_fk },
+            skip,
+            take
+        });
+    }
+
     @MessagePattern('coordinator.find.patients')
     findAll(
         @CurrentClient() currentClient: ClientIds,
@@ -49,7 +65,7 @@ export class PatientController {
         const { limit: take, offset: skip } = paginationDto
 
         return this.patientService.findAll(currentClient, {
-            whereInput: { deleted_at: null },
+            patientWhereInput: { deleted_at: null },
             skip,
             take
         })

@@ -1,13 +1,13 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { CreatePatientDto, UpdatePatientDto } from './dto';
-import { patient, Prisma, PrismaClient } from '@prisma/client';
-import { RpcException } from '@nestjs/microservices';
+import { CreateCompanyDto, UpdateCompanyDto } from './dto';
+import { company, Prisma, PrismaClient } from '@prisma/client';
 import { ClientIds } from 'src/common/interface/client-ids.interface';
+import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
-export class PatientService extends PrismaClient implements OnModuleInit{
+export class CompanyService extends PrismaClient implements OnModuleInit {
 
-    private readonly logger = new Logger('PatientService');
+    private readonly logger = new Logger('CompanyService');
 
     async onModuleInit() {
         await this.$connect();
@@ -16,19 +16,17 @@ export class PatientService extends PrismaClient implements OnModuleInit{
 
     async create(currentClient: ClientIds, params: {
         client_updated_by: Prisma.clientWhereUniqueInput,
-        company_company_fk: Prisma.companyWhereUniqueInput,
-        data: Prisma.patientCreateInput
-    }): Promise<patient> { 
+        data: Prisma.companyCreateInput
+    }): Promise<company> { 
 
-        const { client_updated_by, company_company_fk, data } = params
+        const { client_updated_by, data } = params
 
         data.client = { connect: currentClient }
-        data.company = { connect: company_company_fk }
         data.client_updated_by = { connect: client_updated_by }
 
         try {
 
-            return await this.patient.create({ data })
+            return await this.company.create({ data })
 
         } catch (error) {
             throw new RpcException({
@@ -39,40 +37,17 @@ export class PatientService extends PrismaClient implements OnModuleInit{
     }
 
     async findOneByUnique(currentClient: ClientIds, params: {
-        patientWhereUniqueInput: Prisma.patientWhereUniqueInput,
-        select?: Prisma.patientSelect
-    }): Promise<patient> {
+        companyWhereUniqueInput: Prisma.companyWhereUniqueInput,
+        select?: Prisma.companySelect
+    }): Promise<company> {
 
-        const {patientWhereUniqueInput: where, select} = params
-
-        where.client = currentClient
-
-        try {
-            
-            return await this.patient.findUniqueOrThrow({ where, select })
-
-        } catch (error) {
-            throw new RpcException({
-                status: 400,
-                message: error.message
-            });
-        }
-    }
-
-    async findByCompany(currentClient: ClientIds, params: {
-        patientWhereInput: Prisma.patientWhereInput,
-        select?: Prisma.patientSelect,
-        skip?: Prisma.patientFindManyArgs['skip'],
-        take?: Prisma.patientFindManyArgs['take'],
-    }): Promise<patient[]> {
-
-        const { patientWhereInput: where, select, skip, take } = params
+        const {companyWhereUniqueInput: where, select} = params
 
         where.client = currentClient
 
         try {
             
-            return await this.patient.findMany({ where, select, skip, take })
+            return await this.company.findUniqueOrThrow({ where, select })
 
         } catch (error) {
             throw new RpcException({
@@ -83,19 +58,19 @@ export class PatientService extends PrismaClient implements OnModuleInit{
     }
     
     async findAll(currentClient: ClientIds, params?: {
-        patientWhereInput: Prisma.patientWhereInput,
-        select?: Prisma.patientSelect,
-        skip?: Prisma.patientFindManyArgs['skip'],
-        take?: Prisma.patientFindManyArgs['take'],
-    }): Promise<patient[]> {
+        whereInput: Prisma.companyWhereInput,
+        select?: Prisma.companySelect,
+        skip?: Prisma.companyFindManyArgs['skip'],
+        take?: Prisma.companyFindManyArgs['take'],
+    }): Promise<company[]> {
 
-        const { patientWhereInput: where, select, skip, take } = params
+        const { whereInput: where, select, skip, take } = params
 
         where.client = currentClient
 
         try {
 
-            return await this.patient.findMany({ where, select, skip, take })
+            return await this.company.findMany({ where, select, skip, take })
 
         } catch (error) {
             throw new RpcException({
@@ -106,10 +81,10 @@ export class PatientService extends PrismaClient implements OnModuleInit{
     }
 
     async update(currentClient: ClientIds, params: {
-        whereUniqueInput: Prisma.patientWhereUniqueInput,
+        whereUniqueInput: Prisma.companyWhereUniqueInput,
         client_updated_by: Prisma.clientWhereUniqueInput,
-        data: Prisma.patientUpdateInput,
-    }): Promise<patient> {
+        data: Prisma.companyUpdateInput,
+    }): Promise<company> {
 
         const { whereUniqueInput: where, data, client_updated_by } = params
 
@@ -118,7 +93,7 @@ export class PatientService extends PrismaClient implements OnModuleInit{
 
         try {
 
-            return await this.patient.update({ where, data })
+            return await this.company.update({ where, data })
 
         } catch (error) {
             throw new RpcException({
@@ -129,27 +104,27 @@ export class PatientService extends PrismaClient implements OnModuleInit{
     }
 
     async delete(currentClient: ClientIds, params: {
-        whereUniqueInput: Prisma.patientWhereUniqueInput,
+        whereUniqueInput: Prisma.companyWhereUniqueInput,
         client_updated_by: Prisma.clientWhereUniqueInput,
-    }): Promise<patient> {
+    }): Promise<company> {
 
         const { whereUniqueInput: where, client_updated_by } = params
-        const { patient_id } = where
+        const { company_id } = where
         
         where.client = currentClient
         
         try {
 
             // Verifico que exista el paciente y que perteza al cliente
-            const patient = await this.patient.findFirstOrThrow({ where })
+            const company = await this.company.findFirstOrThrow({ where })
             
-            if (patient.deleted_at) throw new RpcException({
+            if (company.deleted_at) throw new RpcException({
                 status: 404,
                 message: 'El paciente ya ha sido eliminado'
             });
 
-            return await this.patient.update({
-                where: { patient_id: patient_id as number },
+            return await this.company.update({
+                where: { company_id: company_id as number },
                 data: { 
                     deleted_at: new Date(), 
                     client_updated_by: { connect: client_updated_by }

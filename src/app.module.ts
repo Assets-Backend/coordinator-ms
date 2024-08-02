@@ -1,13 +1,15 @@
 import { Module } from '@nestjs/common';
 import { 
     ClientModule,
+    PatientModule,
+    CompanyModule
 } from './modules';
-import { PatientModule } from './modules/patient/patient.module';
 
 @Module({
     imports: [
         ClientModule,
         PatientModule,
+        CompanyModule,
     ],
     controllers: [],
     providers: [],
