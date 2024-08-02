@@ -48,7 +48,7 @@ export class CompanyController {
         const { limit: take, offset: skip } = paginationDto
 
         return this.companyService.findAll(currentClient, {
-            whereInput: { deleted_at: null },
+            companyWhereInput: { deleted_at: null },
             skip,
             take
         })

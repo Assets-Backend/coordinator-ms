@@ -57,10 +57,10 @@ model company_has_treatment {
   updated_by                                      Int
   created_at                                      DateTime  @default(now()) @db.Timestamp(6)
   updated_at                                      DateTime  @default(now()) @db.Timestamp(6)
-  client_company_has_treatment_client_fkToclient  client    @relation("company_has_treatment_client_fkToclient", fields: [client_fk], references: [client_id], onDelete: NoAction, onUpdate: NoAction)
+  client                                          client    @relation("company_has_treatment_client_fkToclient", fields: [client_fk], references: [client_id], onDelete: NoAction, onUpdate: NoAction)
   company                                         company   @relation(fields: [company_fk], references: [company_id], onDelete: NoAction, onUpdate: NoAction)
   treatment                                       treatment @relation(fields: [treatment_fk], references: [treatment_id], onDelete: NoAction, onUpdate: NoAction)
-  client_company_has_treatment_updated_byToclient client    @relation("company_has_treatment_updated_byToclient", fields: [updated_by], references: [client_id], onDelete: NoAction, onUpdate: NoAction)
+  client_updated_by                               client    @relation("company_has_treatment_updated_byToclient", fields: [updated_by], references: [client_id], onDelete: NoAction, onUpdate: NoAction)
 
   @@id([client_fk, company_fk, treatment_fk])
 }

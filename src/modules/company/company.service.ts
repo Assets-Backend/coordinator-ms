@@ -58,13 +58,13 @@ export class CompanyService extends PrismaClient implements OnModuleInit {
     }
     
     async findAll(currentClient: ClientIds, params?: {
-        whereInput: Prisma.companyWhereInput,
+        companyWhereInput: Prisma.companyWhereInput,
         select?: Prisma.companySelect,
         skip?: Prisma.companyFindManyArgs['skip'],
         take?: Prisma.companyFindManyArgs['take'],
     }): Promise<company[]> {
 
-        const { whereInput: where, select, skip, take } = params
+        const { companyWhereInput: where, select, skip, take } = params
 
         where.client = currentClient
 

@@ -3,7 +3,8 @@ import {
     ClientModule,
     PatientModule,
     CompanyModule,
-    TreatmentModule
+    TreatmentModule,
+    CompanyHasTreatmentModule
 } from './modules';
 
 @Module({
@@ -12,6 +13,7 @@ import {
         PatientModule,
         CompanyModule,
         TreatmentModule,
+        CompanyHasTreatmentModule,
     ],
     controllers: [],
     providers: [],
