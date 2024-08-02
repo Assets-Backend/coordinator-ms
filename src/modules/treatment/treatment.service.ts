@@ -1,13 +1,13 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { CreateCompanyDto, UpdateCompanyDto } from './dto';
-import { company, Prisma, PrismaClient } from '@prisma/client';
+import { CreateTreatmentDto, UpdateTreatmentDto } from './dto';
+import { Prisma, PrismaClient, treatment } from '@prisma/client';
 import { ClientIds } from 'src/common/interface/client-ids.interface';
 import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
-export class CompanyService extends PrismaClient implements OnModuleInit {
+export class TreatmentService extends PrismaClient implements OnModuleInit {
 
-    private readonly logger = new Logger('CompanyService');
+    private readonly logger = new Logger('TreatmentService');
 
     async onModuleInit() {
         await this.$connect();
@@ -16,8 +16,8 @@ export class CompanyService extends PrismaClient implements OnModuleInit {
 
     async create(currentClient: ClientIds, params: {
         client_updated_by: Prisma.clientWhereUniqueInput,
-        data: Prisma.companyCreateInput
-    }): Promise<company> { 
+        data: Prisma.treatmentCreateInput
+    }): Promise<treatment> { 
 
         const { client_updated_by, data } = params
 
@@ -26,7 +26,7 @@ export class CompanyService extends PrismaClient implements OnModuleInit {
 
         try {
 
-            return await this.company.create({ data })
+            return await this.treatment.create({ data })
 
         } catch (error) {
             throw new RpcException({
@@ -37,17 +37,17 @@ export class CompanyService extends PrismaClient implements OnModuleInit {
     }
 
     async findOneByUnique(currentClient: ClientIds, params: {
-        companyWhereUniqueInput: Prisma.companyWhereUniqueInput,
-        select?: Prisma.companySelect
-    }): Promise<company> {
+        treatmentWhereUniqueInput: Prisma.treatmentWhereUniqueInput,
+        select?: Prisma.treatmentSelect
+    }): Promise<treatment> {
 
-        const {companyWhereUniqueInput: where, select} = params
+        const {treatmentWhereUniqueInput: where, select} = params
 
         where.client = currentClient
 
         try {
             
-            return await this.company.findUniqueOrThrow({ where, select })
+            return await this.treatment.findUniqueOrThrow({ where, select })
 
         } catch (error) {
             throw new RpcException({
@@ -58,11 +58,11 @@ export class CompanyService extends PrismaClient implements OnModuleInit {
     }
     
     async findAll(currentClient: ClientIds, params?: {
-        whereInput: Prisma.companyWhereInput,
-        select?: Prisma.companySelect,
-        skip?: Prisma.companyFindManyArgs['skip'],
-        take?: Prisma.companyFindManyArgs['take'],
-    }): Promise<company[]> {
+        whereInput: Prisma.treatmentWhereInput,
+        select?: Prisma.treatmentSelect,
+        skip?: Prisma.treatmentFindManyArgs['skip'],
+        take?: Prisma.treatmentFindManyArgs['take'],
+    }): Promise<treatment[]> {
 
         const { whereInput: where, select, skip, take } = params
 
@@ -70,7 +70,7 @@ export class CompanyService extends PrismaClient implements OnModuleInit {
 
         try {
 
-            return await this.company.findMany({ where, select, skip, take })
+            return await this.treatment.findMany({ where, select, skip, take })
 
         } catch (error) {
             throw new RpcException({
@@ -81,10 +81,10 @@ export class CompanyService extends PrismaClient implements OnModuleInit {
     }
 
     async update(currentClient: ClientIds, params: {
-        whereUniqueInput: Prisma.companyWhereUniqueInput,
+        whereUniqueInput: Prisma.treatmentWhereUniqueInput,
         client_updated_by: Prisma.clientWhereUniqueInput,
-        data: Prisma.companyUpdateInput,
-    }): Promise<company> {
+        data: Prisma.treatmentUpdateInput,
+    }): Promise<treatment> {
 
         const { whereUniqueInput: where, data, client_updated_by } = params
 
@@ -93,7 +93,7 @@ export class CompanyService extends PrismaClient implements OnModuleInit {
 
         try {
 
-            return await this.company.update({ where, data })
+            return await this.treatment.update({ where, data })
 
         } catch (error) {
             throw new RpcException({
@@ -104,27 +104,27 @@ export class CompanyService extends PrismaClient implements OnModuleInit {
     }
 
     async delete(currentClient: ClientIds, params: {
-        whereUniqueInput: Prisma.companyWhereUniqueInput,
+        whereUniqueInput: Prisma.treatmentWhereUniqueInput,
         client_updated_by: Prisma.clientWhereUniqueInput,
-    }): Promise<company> {
+    }): Promise<treatment> {
 
         const { whereUniqueInput: where, client_updated_by } = params
-        const { company_id } = where
+        const { treatment_id } = where
         
         where.client = currentClient
         
         try {
 
             // Verifico que exista el paciente y que perteza al cliente
-            const company = await this.company.findFirstOrThrow({ where })
+            const treatment = await this.treatment.findFirstOrThrow({ where })
             
-            if (company.deleted_at) throw new RpcException({
+            if (treatment.deleted_at) throw new RpcException({
                 status: 404,
-                message: 'La empresa ya ha sido eliminado'
+                message: 'La prestación ya ha sido eliminado'
             });
 
-            return await this.company.update({
-                where: { company_id: company_id as number },
+            return await this.treatment.update({
+                where: { treatment_id: treatment_id as number },
                 data: { 
                     deleted_at: new Date(), 
                     client_updated_by: { connect: client_updated_by }

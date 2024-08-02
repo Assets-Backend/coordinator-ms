@@ -2,7 +2,8 @@ import { Module } from '@nestjs/common';
 import { 
     ClientModule,
     PatientModule,
-    CompanyModule
+    CompanyModule,
+    TreatmentModule
 } from './modules';
 
 @Module({
@@ -10,6 +11,7 @@ import {
         ClientModule,
         PatientModule,
         CompanyModule,
+        TreatmentModule,
     ],
     controllers: [],
     providers: [],

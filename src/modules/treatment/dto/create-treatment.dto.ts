@@ -1,6 +1,6 @@
 import { IsInt, IsOptional, IsPositive, IsString, Max, MaxLength, MinLength } from "class-validator";
 
-export class CreateCompanyDto {
+export class CreateTreatmentDto {
 
     @IsInt()
     @IsPositive()
@@ -12,13 +12,12 @@ export class CreateCompanyDto {
     @MaxLength(100)
     name: string;
 
+    @IsString()
+    @MinLength(2)
+    @MaxLength(10)
+    abbreviation: string;
+
     @IsOptional()
     @IsString()
-    @MinLength(10)
-    @MaxLength(20)
-    cuit?: string
-    
-    @IsOptional()
-    @IsString()
-    note?: string;
+    description?: string;
 }
