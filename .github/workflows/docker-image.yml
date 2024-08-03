@@ -40,5 +40,5 @@ jobs:
         NEW_VERSION: ${{ steps.version.outputs.version }}
       run: |
         docker buildx create --name mybuilder --bootstrap --use
-        docker buildx build --platform linux/amd64,linux/arm64 -t nachodocker1714/assets-coordinator-ms:$NEW_VERSION --push .
-        docker buildx build --platform linux/amd64,linux/arm64 -t nachodocker1714/assets-coordinator-ms:latest --push .
+        docker buildx build --platform linux/amd64,linux/arm64 -f ./dockerfile.prod -t nachodocker1714/assets-coordinator-ms:$NEW_VERSION --push .
+        docker buildx build --platform linux/amd64,linux/arm64 -f ./dockerfile.prod -t nachodocker1714/assets-coordinator-ms:latest --push .
