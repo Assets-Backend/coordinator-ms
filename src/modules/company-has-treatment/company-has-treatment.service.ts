@@ -56,7 +56,6 @@ export class CompanyHasTreatmentService extends PrismaClient implements OnModule
             return await this.company_has_treatment.findUniqueOrThrow({ where, select })
 
         } catch (error) {
-            // console.log(error)
             throw new RpcException({
                 status: 400,
                 message: error.message

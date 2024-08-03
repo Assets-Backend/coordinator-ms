@@ -4,7 +4,8 @@ import {
     PatientModule,
     CompanyModule,
     TreatmentModule,
-    CompanyHasTreatmentModule
+    CompanyHasTreatmentModule,
+    TreatmentHasProfessionalModule
 } from './modules';
 
 @Module({
@@ -14,6 +15,7 @@ import {
         CompanyModule,
         TreatmentModule,
         CompanyHasTreatmentModule,
+        TreatmentHasProfessionalModule,
     ],
     controllers: [],
     providers: [],

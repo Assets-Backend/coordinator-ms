@@ -1,6 +1,6 @@
 import { IsInt, IsNumber, IsPositive, Max } from "class-validator";
 
-export class CreateCompanyHasTreatmentDto {
+export class CreateTreatmentHasProfessionalDto {
 
     @IsInt()
     @IsPositive()
@@ -16,6 +16,11 @@ export class CreateCompanyHasTreatmentDto {
     @IsPositive()
     @Max(2147483647)
     treatment_fk: number;
+
+    @IsInt()
+    @IsPositive()
+    @Max(2147483647)
+    professional_fk: number;
 
     @IsNumber()
     @IsPositive()
