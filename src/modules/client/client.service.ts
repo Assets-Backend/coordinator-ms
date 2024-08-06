@@ -5,6 +5,7 @@ import { Prisma, PrismaClient, client } from '@prisma/client';
 import { RpcException } from '@nestjs/microservices';
 import { PaginationDto } from '../../common/dto';
 import { ClientIds } from 'src/common/interface/client-ids.interface';
+import { CompositeIdDto } from './dto';
 
 @Injectable()
 export class ClientService extends PrismaClient implements OnModuleInit{
@@ -118,5 +119,34 @@ export class ClientService extends PrismaClient implements OnModuleInit{
                 message: error.message
             });
         }
+    }
+
+    async validate(currentClient: ClientIds, params: {
+        compositeIdDto: CompositeIdDto
+    }): Promise<boolean> {
+
+        // validar que existe el coordinador, tratamiento, paciente y empresa 
+        // validar que el paciente pertenezca a la empresa
+
+        const { compositeIdDto } = params
+        const { company_fk, patient_fk, treatment_fk } = compositeIdDto
+
+        const patient = await this.patient.findFirst({
+            where: {
+                client: currentClient,
+                patient_id: patient_fk,
+                company_fk,
+                company: {
+                    company_has_treatment: {
+                        some: {
+                            treatment_fk,
+                        }
+                    }
+                }
+            },
+            select: { patient_id: true }
+        })
+
+        return patient ? true : false	
     }
 }

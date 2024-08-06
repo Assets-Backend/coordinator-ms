@@ -32,11 +32,12 @@ export class CompanyHasTreatmentController {
     findOne(
         @CurrentClient() currentClient: ClientIds,
         @Payload('compositeIdDto') compositeIdDto: CompositeIdDto
-    ): Promise<company_has_treatment> {
+    ): Promise<Number> {
 
         return this.companyHasTreatmentService.findOneByUnique(currentClient, {
-            companyHasTreatmentWhereUniqueInput: { client_fk_company_fk_treatment_fk: compositeIdDto }
-        });
+            companyHasTreatmentWhereUniqueInput: { client_fk_company_fk_treatment_fk: compositeIdDto },
+            select: {value: true}
+        }) as unknown as Promise<Number>;
     }
 
     @MessagePattern('coordinator.find.companyHasTreatments')

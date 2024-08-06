@@ -1,7 +1,7 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { ClientService } from './client.service';
-import { CreateClientDto, UpdateClientDto } from './dto';
+import { CompositeIdDto, CreateClientDto, UpdateClientDto } from './dto';
 import { client } from '@prisma/client';
 import { PaginationDto } from 'src/common/dto'
 import { CurrentClient } from 'src/common/decorators/current-client.decorator';
@@ -17,10 +17,17 @@ export class ClientController {
         @CurrentClient() currentClient: ClientIds,
         @Payload('user_id') client_id: number
 	): Promise<client> {
-        console.log('currentClient', currentClient)
 		return this.clientService.findOneByUnique(currentClient, {
             clientWhereUniqueInput: { client_id }
         });
+	}
+
+    @MessagePattern('coordinator.validate.coordinator')
+	validate(
+        @CurrentClient() currentClient: ClientIds,
+        @Payload('compositeIdDto') compositeIdDto: CompositeIdDto
+	): Promise<boolean> {
+		return this.clientService.validate(currentClient, { compositeIdDto });
 	}
 
     @MessagePattern('coordinator.find.users')

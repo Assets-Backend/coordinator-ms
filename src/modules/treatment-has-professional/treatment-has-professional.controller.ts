@@ -16,13 +16,14 @@ export class TreatmentHasProfessionalController {
     findOne(
         @CurrentClient() currentClient: ClientIds,
         @Payload('compositeIdDto') compositeIdDto: CompositeIdDto
-    ): Promise<treatment_has_professional> {
+    ): Promise<Number> {
 
         return this.treatmentHasProfessionalService.findOneByUnique(currentClient, {
             treatmentHasProfessionalmentWhereUniqueInput: { 
                 client_fk_professional_fk_company_fk_treatment_fk: compositeIdDto 
-            }
-        });
+            },
+            select: { value: true }
+        }) as unknown as Promise<Number>;
     }
 
     @MessagePattern('coordinator.find.treatmentHasProfessionals')
