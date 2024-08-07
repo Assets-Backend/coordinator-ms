@@ -71,9 +71,7 @@ export class ClientService extends PrismaClient implements OnModuleInit{
         params.whereUniqueInput ? where.client = currentClient : where.client_id = currentClient.client_id
 
         try {
-
             return await this.client.update({ where, data })
-
         } catch (error) {
             throw new RpcException({
                 status: 400,

@@ -138,4 +138,5 @@ export class CompanyService extends PrismaClient implements OnModuleInit {
             });
         }
     }
+
 }

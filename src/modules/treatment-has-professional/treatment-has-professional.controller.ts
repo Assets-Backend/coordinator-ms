@@ -16,6 +16,19 @@ export class TreatmentHasProfessionalController {
     findOne(
         @CurrentClient() currentClient: ClientIds,
         @Payload('compositeIdDto') compositeIdDto: CompositeIdDto
+    ): Promise<treatment_has_professional> {
+
+        return this.treatmentHasProfessionalService.findOneByUnique(currentClient, {
+            treatmentHasProfessionalmentWhereUniqueInput: { 
+                client_fk_professional_fk_company_fk_treatment_fk: compositeIdDto 
+            }
+        })
+    }
+
+    @MessagePattern('coordinator.getValue.treatmentHasProfessional')
+    getValue(
+        @CurrentClient() currentClient: ClientIds,
+        @Payload('compositeIdDto') compositeIdDto: CompositeIdDto
     ): Promise<Number> {
 
         return this.treatmentHasProfessionalService.findOneByUnique(currentClient, {

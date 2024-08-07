@@ -1,6 +1,6 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { CreatePatientDto, UpdatePatientDto } from './dto';
-import { patient, Prisma, PrismaClient } from '@prisma/client';
+import { company, patient, Prisma, PrismaClient } from '@prisma/client';
 import { RpcException } from '@nestjs/microservices';
 import { ClientIds } from 'src/common/interface/client-ids.interface';
 
@@ -155,6 +155,26 @@ export class PatientService extends PrismaClient implements OnModuleInit{
                     client_updated_by: { connect: client_updated_by }
                 }
             }) 
+
+        } catch (error) {
+            throw new RpcException({
+                status: 400,
+                message: error.message
+            });
+        }
+    }
+
+    async countPatientsByCompany(params: {
+        company_id: company['company_id']
+    }): Promise<number> {
+
+        const { company_id } = params
+
+        try {
+
+            return await this.patient.count({
+                where: { company_fk: company_id }
+            });
 
         } catch (error) {
             throw new RpcException({

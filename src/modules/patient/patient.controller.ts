@@ -81,7 +81,7 @@ export class PatientController {
 
         return this.patientService.update(currentClient, {
             whereUniqueInput: { patient_id },
-            client_updated_by: { client_id  },
+            client_updated_by: { client_id },
             data,
         })
     }
@@ -98,5 +98,12 @@ export class PatientController {
             whereUniqueInput: { patient_id },
             client_updated_by: { client_id }
         })
+    }
+
+    @MessagePattern('coordinator.totalPatients.patients')
+    totalPatients(
+        @Payload('company_id') company_id: CreatePatientDto['company_fk'],
+    ): Promise<number> {
+        return this.patientService.countPatientsByCompany({ company_id })
     }
 }
