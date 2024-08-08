@@ -5,7 +5,7 @@ import { RpcException } from '@nestjs/microservices';
 import { ClientIds } from 'src/common/interface/client-ids.interface';
 
 @Injectable()
-export class PatientService extends PrismaClient implements OnModuleInit{
+export class PatientService extends PrismaClient implements OnModuleInit {
 
     private readonly logger = new Logger('PatientService');
 
