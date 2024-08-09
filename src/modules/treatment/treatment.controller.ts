@@ -1,8 +1,7 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { TreatmentService } from './treatment.service';
-import { CreateTreatmentDto } from './dto/create-treatment.dto';
-import { UpdateTreatmentDto } from './dto/update-treatment.dto';
+import { CreateTreatmentDto, UpdateTreatmentDto } from './dto';
 import { CurrentClient } from 'src/common/decorators/current-client.decorator';
 import { ClientIds } from 'src/common/interface/client-ids.interface';
 import { client, treatment } from '@prisma/client';

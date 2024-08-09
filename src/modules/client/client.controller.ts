@@ -51,8 +51,11 @@ export class ClientController {
 	    @Payload('updateClientDto') updateClientDto: UpdateClientDto
 	): Promise<client> {
 
+        const { updated_by: client_id, ...data } = updateClientDto
+
         return this.clientService.update(currentClient, {
-            data: updateClientDto
+            whereUniqueInput: { client_id },
+            data
         })
 	}
 

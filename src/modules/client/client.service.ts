@@ -1,6 +1,5 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { CreateClientDto } from './dto/create-client.dto';
-import { UpdateClientDto } from './dto/update-client.dto';
+import { CreateClientDto, UpdateClientDto } from './dto';
 import { Prisma, PrismaClient, client } from '@prisma/client';
 import { RpcException } from '@nestjs/microservices';
 import { PaginationDto } from '../../common/dto';
@@ -8,7 +7,7 @@ import { ClientIds } from 'src/common/interface/client-ids.interface';
 import { CompositeIdDto } from './dto';
 
 @Injectable()
-export class ClientService extends PrismaClient implements OnModuleInit{
+export class ClientService extends PrismaClient implements OnModuleInit {
 
     private readonly logger = new Logger('ClientService');
 
@@ -22,14 +21,12 @@ export class ClientService extends PrismaClient implements OnModuleInit{
         select?: Prisma.clientSelect
     }): Promise<client> {
 
-        const {clientWhereUniqueInput: where, select} = params ?? {}
+        const {clientWhereUniqueInput: where, select} = params
 
-        currentClient.client_id != where.client_id ? where.client = currentClient : null 
+        if (currentClient.client_id !== where.client_id) where.client = currentClient
 
         try {
-            
             return await this.client.findUniqueOrThrow({ where, select })
-
         } catch (error) {
             throw new RpcException({
                 status: 400,
@@ -62,15 +59,17 @@ export class ClientService extends PrismaClient implements OnModuleInit{
     }
 
     async update(currentClient: ClientIds, params: {
-        whereUniqueInput?: Prisma.clientWhereUniqueInput, 
+        whereUniqueInput: Prisma.clientWhereUniqueInput,
         data: Prisma.clientUpdateInput,
     }): Promise<client> {
 
-        const { whereUniqueInput: where = {} as Prisma.clientWhereUniqueInput, data } = params
+        const { whereUniqueInput: where, data} = params
 
-        params.whereUniqueInput ? where.client = currentClient : where.client_id = currentClient.client_id
+        if (currentClient.client_id !== where.client_id) where.client = currentClient
 
         try {
+            // TODO: actualizar el usuario en auth-ms
+
             return await this.client.update({ where, data })
         } catch (error) {
             throw new RpcException({
@@ -105,6 +104,8 @@ export class ClientService extends PrismaClient implements OnModuleInit{
                 status: 404,
                 message: 'El usuario ya ha sido eliminado'
             });
+
+            // TODO: eliminar el usuario en auth-ms
 
             return await this.client.update({
                 where: { client_id: client_id as number },
