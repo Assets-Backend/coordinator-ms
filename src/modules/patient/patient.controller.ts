@@ -102,7 +102,7 @@ export class PatientController {
 
     @MessagePattern('coordinator.totalPatients.patients')
     totalPatients(
-        @Payload('company_id') company_id: CreatePatientDto['company_fk'],
+        @Payload('company_id') company_id: patient['company_fk'],
     ): Promise<number> {
         return this.patientService.countPatientsByCompany({ company_id })
     }

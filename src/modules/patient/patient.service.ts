@@ -173,7 +173,7 @@ export class PatientService extends PrismaClient implements OnModuleInit {
         try {
 
             return await this.patient.count({
-                where: { company_fk: company_id }
+                where: { company_fk: company_id, deleted_at: null }
             });
 
         } catch (error) {
