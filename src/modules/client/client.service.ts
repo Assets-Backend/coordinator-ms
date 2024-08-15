@@ -1,15 +1,23 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { CreateClientDto, UpdateClientDto } from './dto';
 import { Prisma, PrismaClient, client } from '@prisma/client';
-import { RpcException } from '@nestjs/microservices';
+import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { PaginationDto } from '../../common/dto';
 import { ClientIds } from 'src/common/interface/client-ids.interface';
 import { CompositeIdDto } from './dto';
+import { NATS_SERVICE } from 'src/config';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable()
 export class ClientService extends PrismaClient implements OnModuleInit {
 
     private readonly logger = new Logger('ClientService');
+
+    constructor(
+        @Inject(NATS_SERVICE) private readonly clientNats: ClientProxy
+    ) {
+        super();
+    }  
 
     async onModuleInit() {
         await this.$connect();
@@ -27,6 +35,53 @@ export class ClientService extends PrismaClient implements OnModuleInit {
 
         try {
             return await this.client.findUniqueOrThrow({ where, select })
+        } catch (error) {
+            throw new RpcException({
+                status: 400,
+                message: error.message
+            });
+        }
+    }
+    
+    async findByOrder(params: {
+        client_id: number,
+        order_fk: number
+    }): Promise<any> {
+
+        const {client_id, order_fk: order_id} = params
+
+        try {
+
+            const client = await this.client.findUniqueOrThrow({ where: { client_id } })
+            const currentClient = { client_id, mongo_id: client.mongo_id }
+    
+            const { patient_fk: patient_id, company_fk: company_id, treatment_fk: treatment_id } = await firstValueFrom(
+                this.clientNats.send('order.find.order', { currentClient, order_id })
+            );
+    
+            // Patient
+            const patient = await this.patient.findUniqueOrThrow({ where: { patient_id } })
+    
+            // Client
+            const coordinator = await this.client.findUniqueOrThrow({ where: { client_id } })
+    
+            // Company
+            const company = await this.company.findUniqueOrThrow({ where: { company_id } })
+    
+            // Treatment
+            const treatment = await this.treatment.findUniqueOrThrow({ where: { treatment_id } })
+
+            return {
+                patient: patient.name,
+                healthcare_provider: patient.healthcare_provider,
+                age: patient.age,
+                gender: patient.gender,
+                company: company.name,
+                client: coordinator.name,
+                treatment: treatment.name,
+                abbreviation: treatment.abbreviation
+            }
+
         } catch (error) {
             throw new RpcException({
                 status: 400,

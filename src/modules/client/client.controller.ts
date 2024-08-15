@@ -22,6 +22,17 @@ export class ClientController {
         });
 	}
 
+	@MessagePattern('coordinator.findByOrder.coordinator')
+	findByOrder(
+        @Payload('order_fk') order_fk: number,
+        @Payload('client_id') client_id: number
+	): Promise<any> {
+		return this.clientService.findByOrder({
+            order_fk,
+            client_id
+        });
+	}
+
     @MessagePattern('coordinator.validate.coordinator')
 	validate(
         @CurrentClient() currentClient: ClientIds,
