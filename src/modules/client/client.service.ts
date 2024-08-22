@@ -72,12 +72,12 @@ export class ClientService extends PrismaClient implements OnModuleInit {
             const treatment = await this.treatment.findUniqueOrThrow({ where: { treatment_id } })
 
             return {
-                patient: patient.name,
+                patient: patient.name + ' ' + patient.last_name,
                 healthcare_provider: patient.healthcare_provider,
                 age: patient.age,
                 gender: patient.gender,
                 company: company.name,
-                client: coordinator.name,
+                client: coordinator.name + ' ' + coordinator.last_name,
                 treatment: treatment.name,
                 abbreviation: treatment.abbreviation
             }
